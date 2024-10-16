@@ -334,7 +334,7 @@ void LightTrack::update(const cv::Mat &x_crop, float scale_z)
     backboneTFData.clear();
     NCHWtoNHWC(xf_data,backboneTFData.data(),1,18,18,96);
     print_rknn(backboneTFData.data(),"02_backbone_model_convert_output.txt",96,18,18);
-    std::cout << "----------: " << backboneTFData[1] << backboneTFData[31103] <<std::endl;
+
     time3.stop();
     time3.show_distance("Update stage ---- output xf extracting cost time");
 
