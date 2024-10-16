@@ -1,0 +1,7 @@
+/home/tta/track/lighttrack/build/CMakeFiles/install/strip.dir
+/home/tta/track/lighttrack/build/CMakeFiles/install/local.dir
+/home/tta/track/lighttrack/build/CMakeFiles/install.dir
+/home/tta/track/lighttrack/build/CMakeFiles/list_install_components.dir
+/home/tta/track/lighttrack/build/CMakeFiles/rebuild_cache.dir
+/home/tta/track/lighttrack/build/CMakeFiles/edit_cache.dir
+/home/tta/track/lighttrack/build/CMakeFiles/LightTrack.dir
