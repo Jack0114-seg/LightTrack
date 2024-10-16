@@ -367,7 +367,11 @@ void LightTrack::update(const cv::Mat &x_crop, float scale_z)
     }
     rknn_outputs_get(net_neck_head, 2, outputs, nullptr);
 
-    float* nf1_data = (float*)outputs[1].buf;
+    float* nf1_data = (float*)outputs[0].buf;
+    print_rknn(nf1_data,"neck_model_output_01.txt",1,18,18);
+
+    float* nf2_data = (float*)outputs[1].buf;
+    print_rknn(nf2_data,"neck_model_output_02.txt",4,18,18);
 
     time4.stop();
     time4.show_distance("Update stage ---- output cls_score and bbox_pred extracting cost time");
@@ -377,7 +381,7 @@ void LightTrack::update(const cv::Mat &x_crop, float scale_z)
     std::vector<float> cls_score_sigmoid;
 
     float *cls_score_data = (float *)outputs[0].buf;
-    float *bbox_score_data = (float *)outputs[0].buf;
+    float *bbox_score_data = (float *)outputs[1].buf;
     cls_score_sigmoid.clear();
 
     int cols = score_size;  //18是最后一个模型的长度和宽度

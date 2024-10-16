@@ -37,7 +37,7 @@ private:
     float lr = 0.616; //给的越大，标定框飘离得越快
     float ratio = 1;
     float penalty_tk = 0.007;
-    float context_amount = 0.1;
+    float context_amount = 0.5;
     float window_influence = 0.225;
     int score_size;
     int total_stride = 16;

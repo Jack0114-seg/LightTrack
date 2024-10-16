@@ -1092,3 +1092,15 @@ time/timer.h
 LightTrack/LightTrack.h
 /home/tta/track/lighttrack/src/LightTrack/LightTrack.h
 
+/home/tta/track/lighttrack/src/main.cpp
+iostream
+-
+cstdlib
+-
+string
+-
+opencv2/opencv.hpp
+/home/tta/track/lighttrack/src/opencv2/opencv.hpp
+LightTrack/LightTrack.h
+/home/tta/track/lighttrack/src/LightTrack/LightTrack.h
+
