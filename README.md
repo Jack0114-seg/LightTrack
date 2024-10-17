@@ -4,7 +4,7 @@ lighttrack 目前环境可以运行
     2：后处理（处理中）
 
 问题：
-  通过官方接口查看模型属性会导致NCHW与NWHC变化（具体通过netron）
+  未对齐onnx，这段时间会继续搞一下这个方法。
 
 
 ---------START QUERY MODEL ATTRBUTE---------
