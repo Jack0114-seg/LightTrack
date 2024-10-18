@@ -91,7 +91,7 @@ void track(LightTrack *siam_tracker, const char *video_path)
     // cv::Rect trackWindow(cv::Point (249, 164), cv::Size (86, 79));
     cv::Rect trackWindow(cv::Point (410, 250), cv::Size (86, 35));
     cv::rectangle(frame,trackWindow,cv::Scalar(0, 255, 0), 2);
-    cv::imwrite("dd.jpg",frame);
+    // cv::imwrite("dd.jpg",frame);
 
     // 通过第一帧图像初始化追踪器
     std::cout << "Start track init ..." << std::endl;
@@ -142,15 +142,16 @@ void track(LightTrack *siam_tracker, const char *video_path)
         //    cv::waitKey(10);
         //    cv::imshow("track_window", track_window);
         //    cv::waitKey(10);
-
             // 相似度大于0.5的情况才进行矩形框标注
             if (score > 0.3)
             {
                 // Draw rect.
                 cv::rectangle(frame, rect, cv::Scalar(0, 255, 0));
-                std::string dd_name = "./jpg/tta" + std::to_string(i) +".jpg";
-                cv::imwrite(dd_name,frame);
+                // std::string dd_name = "./jpg/tta" + std::to_string(i) +".jpg";
+                // cv::imwrite(dd_name,frame);
             }
+            std::string dd_name = "./jpg/tta" + std::to_string(i) +".jpg";
+            cv::imwrite(dd_name,frame);
             i++;
         }
 
@@ -179,14 +180,13 @@ void track(LightTrack *siam_tracker, const char *video_path)
 
 int main(int argc, char** argv)
 {
-    cv::float16_t aaa;
     if (argc != 2)
     {
         fprintf(stderr, "Usage: %s [videopath(file or camera)]\n", argv[0]);
         return -1;
     }
 
-    std::string init_model = "./video/lighttrack_init.rknn";
+    std::string init_model = "./video/lighttrack-127-127_rk3588.rknn";
     std::string backbone_model = "./video/lighttrack_backone.rknn";
     std::string neck_head_model = "./video/lighttrack_neck_head.rknn";
 

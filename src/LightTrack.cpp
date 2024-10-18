@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <thread>
+#include <chrono>
 #include "time/timer.h"
 #include "LightTrack/LightTrack.h"
 
@@ -18,6 +20,11 @@ float combineHalfFloats(cv::float16_t half1, cv::float16_t half2) {
 
     uint32_t combined = (h2 << 16) | h1;
     return *(float*)&combined;
+}
+
+void sleep(int s)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(s));
 }
 
 static void dump_tensor_attr(rknn_tensor_attr *attr)
@@ -41,6 +48,37 @@ void NCHWtoNHWC(const float* nchwData, float* nhwcData, int batchSize, int heigh
             }
         }
     }
+}
+
+/*
+    @addr https://github.com/Z-Xiong/LightTrack-rknn/issues/4
+ */
+// void Z_Xiong_Convert(void)
+// {
+//     float *p_zf_nchw = (float *)zf[0].buf;
+//     std::vector<float> zf_nhwc(w*h*c);
+//     float *p_zf_nhwc = zf_nhwc.data();
+//     for (size_t i = 0; i < c; i++) {
+//         for (size_t j = 0; j < h*w; j++) {
+//             p_zf_nhwc[j * c + i] = p_zf_nchw[i*h*w + j];
+//         }
+//     }
+// }
+
+void print_img(cv::Mat &data, const char* file_name,int channel,int height,int width)
+{
+    printf("start to read input image data......\n");
+    std::ofstream outFile(file_name);
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            cv::Vec3b pixel = data.at<cv::Vec3b>(y, x);
+            outFile << (int)pixel[2] << " " << (int)pixel[1] << " " << (int)pixel[0] << " \n"; //R G B 格式
+        }
+        outFile << std::endl;
+    }
+    outFile.close();
+    printf("end to read input image data.\n");
 }
 
 void print_rknn(float *data, const char* file_name,int channel,int height,int width)
@@ -253,13 +291,23 @@ void LightTrack::init(const cv::Mat& img, cv::Point target_pos_, cv::Point2f tar
     // Set Input Data
     cv::Mat rgb;
     cv::cvtColor(z_crop, rgb, cv::COLOR_BGR2RGB);
+    // cv::imwrite("input.jpg",rgb);
+
+    //先紧靠一张图片验证fp16对齐(ONNX:input{NCHW}  output{NHWC})
+    sleep(2);
+    cv::Mat Input_Image = cv::imread("input.jpg");  //bgr
+    print_img(Input_Image,"Input_Image_Data.txt",3,127,127);
+    cv::Mat Input_Image_RGB;
+    // cv::cvtColor(Input_Image, Input_Image_RGB, cv::COLOR_BGR2RGB);
+    std::cout << "Input Image size [cols , rows , channels] : " << "[" << Input_Image_RGB.cols << "," << Input_Image_RGB.rows << "," << Input_Image_RGB.channels() << "]" << std::endl;
+
     rknn_input rknn_img[1];
     memset(rknn_img, 0, sizeof(rknn_img));
     rknn_img[0].index = 0;
     rknn_img[0].type = RKNN_TENSOR_UINT8;                 //设置成这主要是8UC3
-    rknn_img[0].size = rgb.cols*rgb.rows*rgb.channels();  //[w*h*c]总像素数（因为type不用×2）
+    rknn_img[0].size = Input_Image.cols*rgb.rows*rgb.channels();  //[w*h*c]总像素数（因为type不用×2）
     rknn_img[0].fmt = RKNN_TENSOR_NHWC;
-    rknn_img[0].buf = rgb.data;
+    rknn_img[0].buf = Input_Image.data;
     rknn_inputs_set(net_init, 1, rknn_img);
 
     // Run
@@ -274,11 +322,12 @@ void LightTrack::init(const cv::Mat& img, cv::Point target_pos_, cv::Point2f tar
     rknn_outputs_get(net_init, 1, zf, nullptr);
 
     //重新排序
+    std::cout << "model size: " << zf[0].size << std::endl;
     float *zf_data = (float *)zf[0].buf;
     print_rknn(zf_data,"01_init_model_output.txt",96,8,8);
     initTFData.clear();
     NCHWtoNHWC(zf_data,initTFData.data(),1,8,8,96);
-    print_rknn(initTFData.data(),"02_init_model_convert_output.txt",96,8,8);
+    // print_rknn(initTFData.data(),"02_init_model_convert_output.txt",96,8,8);
 
     std::vector<float> hanning(this->score_size,0);  // 18
 
@@ -329,11 +378,12 @@ void LightTrack::update(const cv::Mat &x_crop, float scale_z)
     }
     rknn_outputs_get(net_backbone, 1, xf, nullptr);
 
+    std::cout << "model size: " << xf[0].size << std::endl;
     float *xf_data = (float *)xf[0].buf;
-    print_rknn(xf_data,"01_backbone_model_output.txt",96,18,18);
+    // print_rknn(xf_data,"01_backbone_model_output.txt",96,18,18);
     backboneTFData.clear();
     NCHWtoNHWC(xf_data,backboneTFData.data(),1,18,18,96);
-    print_rknn(backboneTFData.data(),"02_backbone_model_convert_output.txt",96,18,18);
+    // print_rknn(backboneTFData.data(),"02_backbone_model_convert_output.txt",96,18,18);
 
     time3.stop();
     time3.show_distance("Update stage ---- output xf extracting cost time");
@@ -368,10 +418,10 @@ void LightTrack::update(const cv::Mat &x_crop, float scale_z)
     rknn_outputs_get(net_neck_head, 2, outputs, nullptr);
 
     float* nf1_data = (float*)outputs[0].buf;
-    print_rknn(nf1_data,"neck_model_output_01.txt",1,18,18);
+    // print_rknn(nf1_data,"neck_model_output_01.txt",1,18,18);
 
     float* nf2_data = (float*)outputs[1].buf;
-    print_rknn(nf2_data,"neck_model_output_02.txt",4,18,18);
+    // print_rknn(nf2_data,"neck_model_output_02.txt",4,18,18);
 
     time4.stop();
     time4.show_distance("Update stage ---- output cls_score and bbox_pred extracting cost time");
