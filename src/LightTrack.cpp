@@ -297,9 +297,9 @@ void LightTrack::init(const cv::Mat& img, cv::Point target_pos_, cv::Point2f tar
     sleep(2);
     cv::Mat Input_Image = cv::imread("input.jpg");  //bgr
     print_img(Input_Image,"Input_Image_Data.txt",3,127,127);
-    cv::Mat Input_Image_RGB;
+    // cv::Mat Input_Image_RGB;
     // cv::cvtColor(Input_Image, Input_Image_RGB, cv::COLOR_BGR2RGB);
-    std::cout << "Input Image size [cols , rows , channels] : " << "[" << Input_Image_RGB.cols << "," << Input_Image_RGB.rows << "," << Input_Image_RGB.channels() << "]" << std::endl;
+    std::cout << "Input Image size [cols , rows , channels] : " << "[" << Input_Image.cols << "," << Input_Image.rows << "," << Input_Image.channels() << "]" << std::endl;
 
     rknn_input rknn_img[1];
     memset(rknn_img, 0, sizeof(rknn_img));
