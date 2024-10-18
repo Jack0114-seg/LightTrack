@@ -13,6 +13,7 @@
 #define PI 3.1415926f
 
 using namespace cv;
+void print_rknn(float *data, const char* file_name,int channel,int height,int width);
 
 class LightTrack {
 public:

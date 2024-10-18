@@ -31,6 +31,7 @@ add_executable(LightTrack
     src/main.cpp
     src/LightTrack.cpp
     )
+# add_executable(get_image src/img.cpp)
 
 target_link_libraries(LightTrack
             libade.a
@@ -53,8 +54,8 @@ target_link_libraries(LightTrack
             -lrknnrt  -lavformat -lavcodec -lavdevice -lavfilter -lavutil -lswresample -lswscale)
 
 ## install target
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install/lighttrack_demo)
-install(TARGETS LightTrack RUNTIME DESTINATION ./)
-install(DIRECTORY model DESTINATION ./)
-install(FILES lib/librknn_api.so DESTINATION ./)
-install(FILES 01.mp4 DESTINATION ./)
+# set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install/lighttrack_demo)
+# install(TARGETS LightTrack RUNTIME DESTINATION ./)
+# install(DIRECTORY model DESTINATION ./)
+# install(FILES lib/librknn_api.so DESTINATION ./)
+# install(FILES 01.mp4 DESTINATION ./)
